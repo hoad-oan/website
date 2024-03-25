@@ -1,5 +1,6 @@
 import yfinance as yf
 import requests
+from datetime import date, timedelta
 from bs4 import BeautifulSoup
 
 # URL of the S&P 500 index page on the official S&P Dow Jones Indices website
@@ -37,17 +38,42 @@ if getDataFromPage:
     except Exception as e:
         print("An error occurred:", e)
 
-class Stock:
+class StockInfo:
     # class attribute, shared by all stock
-    def __init__(self, ticker):
+    def __init__(self, ticker, adjClose, percentChange):
         # object attribute, specific to each stock object
         self.ticker = ticker
-        self.adjClose = ticker.info('Adj Close')
-        self.precentChange = ticker.info('get_percent_change()')
+        self.adjClose = adjClose
+        self.percentChange = percentChange
 
 class main:
-    listOfSP10 = ['MSFT', 'APPL', 'NVDA', 'AMZN', 'META', 'GOOGL', 'BRK.B', 'GOOG', 'LLY', 'AVGO']
+    listOfSP10 = ['MSFT', 'AAPL', 'NVDA', 'AMZN', 'META', 'GOOGL', 'BRK-B', 'GOOG', 'LLY', 'AVGO']
     listOfConstituents = []
+
+    def getPriceAndPercentChange(ticker, previousOpenDate):
+        todayStock = yf.download(ticker, start=previousOpenDate)
+        adjClosePrices = todayStock["Adj Close"]
+        print(adjClosePrices)
+        latestAdjClose = adjClosePrices.iloc[-1]
+        previousAdjClose = adjClosePrices.iloc[-2]
+
+        dailyChanges = (latestAdjClose - previousAdjClose)/previousAdjClose * 100
+        return latestAdjClose, dailyChanges
+
+    # find current open market date
+    currentOpenDate = date.today()
+    while currentOpenDate.weekday() in (5,6):
+        currentOpenDate = currentOpenDate - timedelta(days=1)
+
+    # find the previous open market date
+    previousOpenDate = currentOpenDate - timedelta(days=1)
+    while previousOpenDate.weekday() in (0,5,6): # if today is Monday and the previous date is when market close
+        previousOpenDate = previousOpenDate - timedelta(days=1)
+
+    # print(previousOpenDate)
+
     for ticker in listOfSP10:
-        constituent = Stock(ticker)
+        latestAdjClose, latestPercentChanges = getPriceAndPercentChange(ticker, previousOpenDate)
+        constituent = StockInfo(ticker, latestAdjClose, latestPercentChanges)
         listOfConstituents.append(constituent)
+        print(constituent.percentChange)
