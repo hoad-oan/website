@@ -72,8 +72,14 @@ class main:
 
     # print(previousOpenDate)
 
-    for ticker in listOfSP10:
-        latestAdjClose, latestPercentChanges = getPriceAndPercentChange(ticker, previousOpenDate)
-        constituent = StockInfo(ticker, latestAdjClose, latestPercentChanges)
-        listOfConstituents.append(constituent)
-        print(constituent.percentChange)
+    # for ticker in listOfSP10:
+    #     latestAdjClose, latestPercentChanges = getPriceAndPercentChange(ticker, previousOpenDate)
+    #     constituent = StockInfo(ticker, latestAdjClose, latestPercentChanges)
+    #     listOfConstituents.append(constituent)
+    #     print(constituent.percentChange)
+        
+    msft = yf.Ticker("MSFT")
+    # get all stock info
+    print(type(msft.info))
+
+
