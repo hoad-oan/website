@@ -38,6 +38,8 @@ if getDataFromPage:
     except Exception as e:
         print("An error occurred:", e)
 
+# .download only shows the Open        High         Low       Close   Adj Close    Volume - it gives adj close price
+# .info gives more information
 class StockInfo:
     # class attribute, shared by all stock
     def __init__(self, ticker, adjClose, percentChange):
@@ -53,7 +55,7 @@ class main:
     def getPriceAndPercentChange(ticker, previousOpenDate):
         todayStock = yf.download(ticker, start=previousOpenDate)
         adjClosePrices = todayStock["Adj Close"]
-        print(adjClosePrices)
+        # print(adjClosePrices)
         latestAdjClose = adjClosePrices.iloc[-1]
         previousAdjClose = adjClosePrices.iloc[-2]
 
@@ -72,14 +74,36 @@ class main:
 
     # print(previousOpenDate)
 
-    # for ticker in listOfSP10:
+    # for ticker in listOfSP10[0:1]:
     #     latestAdjClose, latestPercentChanges = getPriceAndPercentChange(ticker, previousOpenDate)
     #     constituent = StockInfo(ticker, latestAdjClose, latestPercentChanges)
     #     listOfConstituents.append(constituent)
-    #     print(constituent.percentChange)
+    #     print("percent change: ", constituent.percentChange)
+    #     print("last price: ", constituent.percentChange)
+    
+        def getCompanyInfo(tickerString):
+            currStock = yf.Ticker(tickerString)
+            # get all company info
+            companyAllInfo = currStock.info
+            # get sector and industry for classification
+            companySector = companyAllInfo['sector']
+            companyIndustry = companyAllInfo['industry']
+            return companySector, companyIndustry
+
         
-    msft = yf.Ticker("MSFT")
-    # get all stock info
-    print(type(msft.info))
+        def calculateDividendYield(tickerString, currentPosition):
+            currStock = yf.Ticker(tickerString)
+            # get all company info
+            companyAllInfo = currStock.info
+            # get dividend yield percentage
+            dividendYieldPercent = companyAllInfo['dividendYield']
+            dividendEarned = currentPosition * dividendYieldPercent
+            # showcase last divident date
+            lastDividendDate = companyAllInfo['lastDividendDate']
+            return dividendEarned, lastDividendDate
+
+
+
+
 
 
